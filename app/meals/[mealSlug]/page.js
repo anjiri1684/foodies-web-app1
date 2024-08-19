@@ -1,15 +1,36 @@
-import Link from "next/link";
+import Image from "next/image";
+import classes from "./page.module.css";
+import { getMeal } from "@/lib/meals";
+import { notFound } from "next/navigation";
 
 export default function MealDetails({ params }) {
+  const meal = getMeal(params.mealSlug);
+
+  if (!meal) {
+    notFound();
+  }
+
+  meal.instructions = meal.instructions.replace(/\n/g, "<br />");
   return (
-    <>
-      <h1>Meal Details</h1>
-      <p>
-        You're try to access{" "}
-        <span style={{ color: "red" }}>{params.mealSlug}</span> which is not yet
-        active on this page click <Link href="/meals">here</Link> To navigate
-        back to home
-      </p>
-    </>
+    <header className={classes.header}>
+      <div className={classes.image}>
+        <Image src={meal.image} alt={meal.title} fill />
+      </div>
+      <div className={classes.headerText}>
+        <h1>{meal.title}</h1>
+        <p className={classes.creator}>
+          by <a href={`mailto:${meal.creator_email}`}>{meal.creator}</a>
+        </p>
+      </div>
+      <p className={classes.sammary}>{meal.sammary}</p>
+      <main>
+        <p
+          className={classes.instructions}
+          dangerouslySetInnerHTML={{
+            __html: meal.instructions,
+          }}
+        ></p>
+      </main>
+    </header>
   );
 }
